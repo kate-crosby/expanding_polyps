@@ -1,10 +1,3 @@
-library(doParallel)
-## Loading required package: foreach
-## Loading required package: iterators
-## Loading required package: parallel
-detectCores()
-cl <- makeCluster(4)  # Use 4 cores
-registerDoParallel(cl)
 
 # Run 1000 simulations,
 # on a popsize of 1000 each simulation for 40 generations
@@ -42,7 +35,7 @@ autopolyrate <- 0.001
 redpolyrate <- 0.00001
 
 # Outputs defined below
-Output = matrix(0,totalGen,10)
+Output = matrix(0,totalGen,15)
 OutputSims = matrix (0, totalSims, 11)
 
 # Start simulation loop - i.e. for each simulation
@@ -70,10 +63,9 @@ for(isim in 1:totalSims)
     num.dip.outcrossers <- rbinom(1, popsize.dip, outcrossingrate)
     selfers.dip <- popsize.dip - num.dip.outcrossers
 
-
-    ####HERE IS A HARD PART - we can identify a doubling but then need to double
-    ###array size mannnnnnnn - actually I think it's easy - gotta think where
-    # that line is gonna go***************************************************
+####### HERE IS A HARD PART - we can identify a doubling but then need to double
+##### array size mannnnnnnn - actually I think it's easy - gotta think where
+##### that line is gonna go***************************************************
     num.dip2tetra <- rbinom(1, popsize.dip, autopolyrate)
     num.tetra2dip <- rbinom(1, popsize.tetra, redpolyrate)
 #################################################################################
@@ -83,14 +75,15 @@ for(isim in 1:totalSims)
     selfers.tetra <- popsize.tetra - num.tetra.outcrossers
 
 
-
     Output[igen,1] <- igen
     Output[igen,2] <- popsize.dip
     Output[igen,3] <- popsize.tetra
     Output[igen,4] <- num.dip.outcrossers
-    Output[igen,5] <- num.tetra.outcrossers
-    Output[igen,6] <- selfers.dip
-    Output[igen,7] <- selfers.tetra
+    Output[igen,5] <- num.dip2tetra
+    Output[igen,6] <- num.tetra2dip
+    Output[igen,7] <- num.tetra.outcrossers
+    Output[igen,8] <- selfers.dip
+    Output[igen,9] <- selfers.tetra
 
 
 # Section below I want to keep track of who's outcrossing vs. sexing
@@ -127,17 +120,49 @@ for(isim in 1:totalSims)
     dads.id.dip <- parents.dips[dads.dip,]
 
     locus.dip.pollen <- dads.id[,1:2]
-
-
     dad.sex.locus.dip.allele2 <- NULL
     for(i in 1:nrow(locus.dip.pollen))
     {
       dad.sex.locus.dip.allele2[i] = sample(locus.dip.pollen[i,],1)
     }
-    # Then cbind the alleles for locus 1 and locus 2 together making a new dataframe
+
+
+# Then cbind the alleles for diploid locus 1 together making a new dataframe
 
     new.outcrossed.diploid.progeny <- data.frame(cbind(mom.sex.locus.dip.allele1,
       dad.sex.locus.dip.allele2)
+
+#################################################################################
+# Now repeat the whole outcrossing process for the tetraploids - note it's double
+# what is above - for every locus there should be 4 alleles - we can make it
+# act disomic or Mendelian - I'm going with disomic below
+#################################################################################
+  locus1.tetra.maternal <- sex.id.dip[,1:2]
+  locus2.tetra.maternal <- sex.id.dip[,3:4]
+  mom.sex.locus.dip.allele1 <- NULL
+
+  for(i in 1:nrow(locus1.tetra.maternal))
+  {
+  mom.sex.locus.dip.allele1[i] = sample(locus.dip.maternal[i,],1)
+  }
+
+# Now bring in the allele from diploid dads - the pollen
+  dads.dip <- sample(1:popsize.dip,num.dip.outcrossers)
+  dads.id.dip <- parents.dips[dads.dip,]
+
+  locus.dip.pollen <- dads.id[,1:2]
+  dad.sex.locus.dip.allele2 <- NULL
+  for(i in 1:nrow(locus.dip.pollen))
+  {
+  dad.sex.locus.dip.allele2[i] = sample(locus.dip.pollen[i,],1)
+  }
+
+
+# Then cbind the alleles for diploid locus 1 together making a new dataframe
+
+new.outcrossed.tetraploid.progeny <- data.frame(cbind(mom.sex.locus.dip.allele1,
+  dad.sex.locus.dip.allele2)
+
 
     # Now do the selfers
     # For the selfers - use "self.id" array, and define each locus
@@ -208,7 +233,8 @@ for(isim in 1:totalSims)
     Output[igen,10] <- dark/popsize
 
 
-    parents = new.generation
+    dip.parents = new.dip.generation
+    tetra.parents = new.tetra.generation
   }
 
   #Output
