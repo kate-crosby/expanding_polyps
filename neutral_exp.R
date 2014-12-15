@@ -7,7 +7,7 @@
 # Not sure if we should start with some initial tetras or create them from dips
 # HMMMMMMMMMMMMMM
 
-totalSims <- 1000
+totalSims <- 2
 popsize.dip <- 1000
 popsize.tetra <- 10
 totalGen <- 100
