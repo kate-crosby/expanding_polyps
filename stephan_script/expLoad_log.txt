@@ -1,0 +1,16 @@
+Simulating an expansion on a 10x100 grid. 
+Selection is soft.
+
+Parameters: 
+   Carrying capacity: 100
+   Migration rate: 0.1
+   Selection coefficient: 0.001
+   Mutation rate: 0.0001
+   Burnin time: 0
+   Expansion start: 2000
+ Ancestral population size: 100
+
+ Expansion Mode: 0
+
+ Number of replicates: 1
+
