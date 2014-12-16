@@ -1,0 +1,471 @@
+.806*40
+.806*39
+.806*38
+.806*37
+.806*57
+.806*59
+.806*58
+.806*200
+.806*24
+.806*26
+.806*13
+14/20
+15/20
+15/22
+16/22
+17/22
+18/22
+18/23
+18/24
+19/24
+20/24
+32/40
+rm(list=ls())#
+#
+######################################
+#Let's get the GBIF oat records first#
+######################################
+#
+library(rgbif)#
+#
+#####################################
+#Get A. barbata species key#
+#####################################
+key <- name_backbone(name = "Zea mays", kingdom = "plants")$speciesKey#
+key
+occ_count(nubKey = 5290052)
+occ_count(taxonKey = 5290052)
+data_oats <- occ_search(taxonKey = key, return = "data", limit = 100, #
+                        fields="all", georeferenced=T)
+data_oats <- occ_search(taxonKey = key, return = "data", limit = 100, #
+                        fields="all")
+data_oats
+library(MADAM)
+set.seed(123)#
+pp <- matrix(c(runif(20),c(0.001,0.02,0.03,0.001)), ncol=4)#
+pp[2,3] <- NA#
+fisher.method(pp)
+library(MADAM)
+set.seed(123)#
+pp <- matrix(c(runif(20),c(0.001,0.02,0.03,0.001)), ncol=4)#
+pp[2,3] <- NA#
+fisher.method(pp)
+pp
+pp <- matrix(c(runif(20),c(0.001,0.02,0.03,0.001)), ncol=4)
+pp
+pp <- matrix(c(0.001,0.001,0.007,0.034,0.5,0.78,0.018,0.011), ncol=1)
+pp
+fisher.method(pp)
+pp <- matrix(c(0.001,0.001,0.007,0.034,0.5,0.78,0.018,0.011), ncol=8)#
+#
+fisher.method(pp)
+rm(list=ls())#
+#
+library(MADAM)#
+#
+# Perform Fisher's method across groups of latitude across p-values#
+#
+# Lemma#
+dd <- matrix(c(0.001,0.001,0.007,0.034,0.5,0.78,0.018,0.011), ncol=8)#
+#
+fisher.method(dd)#
+#
+# Pubescence#
+#
+pp <- matrix(c(0.001,0.001,0.001,0.001,0.044, 0.005, 0.78, 0.78), ncol=8)#
+#
+fisher.method(pp)
+library(RNeo4j)
+graph = startGraph("http://localhost:7474/db/data/")#
+importSample(graph, "tweets")
+?startGraph
+library(RNeo4j)
+graph = startGraph("http://localhost:7474/db/data/")#
+importSample(graph, "tweets")
+neo4j = getUniqueNode(graph, "User", screen_name = "neo4j")#
+sapply(lapply(outgoingRels(neo4j, "POSTS"), endNode), function(t) t$text)#
+#
+# Top mentioned users.#
+query = "#
+MATCH (:Tweet)-[:MENTIONS]->(u:User)#
+RETURN u.screen_name AS user, COUNT(*) AS mentions#
+ORDER BY mentions DESC#
+LIMIT 10#
+"#
+#
+cypher(graph, query)
+ls()
+summary(graph)
+neo4j = startGraph("http://localhost:7474/db/data/")#
+importSample(neo4j, "movies")
+summary(neo4j)
+nodes_query = "#
+MATCH (a:Person)-[:ACTED_IN]->(:Movie)#
+RETURN DISTINCT ID(a) AS id, a.name AS name#
+"#
+#
+edges_query = "#
+MATCH (a1:Person)-[:ACTED_IN]->(:Movie)<-[:ACTED_IN]-(a2:Person)#
+RETURN ID(a1) AS source, ID(a2) AS target#
+"#
+#
+nodes = cypher(neo4j, nodes_query)#
+edges = cypher(neo4j, edges_query)
+library(igraph)#
+#
+# Create igraph graph object.#
+ig = graph.data.frame(edges, directed = FALSE, nodes)#
+#
+# Run Girvan-Newman clustering algorithm.#
+communities = edge.betweenness.community(ig)#
+#
+# Extract cluster assignments and merge with nodes data.frame.#
+memb = data.frame(name = communities$names, cluster = communities$membership)#
+nodes = merge(nodes, memb)#
+#
+# Reorder columns.#
+nodes = nodes[c("id", "name", "cluster")]
+head(nodes)
+nodes_json = paste0("\"nodes\":", jsonlite::toJSON(nodes))#
+edges_json = paste0("\"edges\":", jsonlite::toJSON(edges))#
+all_json = paste0("{", nodes_json, ",", edges_json, "}")#
+#
+sink(file = 'actors.json')#
+cat(all_json)#
+sink()
+actors.json
+<html>#
+<head>#
+<link rel="stylesheet" href="http://cdn.graphalchemist.com/alchemy.min.css">#
+</head>#
+  <body>#
+    <div class="alchemy" id="alchemy"></div>#
+    <script src="http://cdn.graphalchemist.com/alchemy.min.js"></script>#
+    <script type="text/javascript">#
+        alchemy.begin({#
+            dataSource: "actors.json", #
+            nodeCaption: 'name', #
+            nodeMouseOver: 'name',#
+            cluster: true,#
+            clusterColours: ["#1B9E77","#D95F02","#7570B3","#E7298A","#66A61E","#E6AB02"]})#
+    </script>#
+  </body>#
+</html>
+library(snpStats)#
+#
+pedfile <- system.file("extdata/sample.ped.gz", package="snpStats")#
+pedfile#
+infofile <- system.file("extdata/sample.info", package="snpStats")#
+#
+sample <- read.pedfile(pedfile, snps=infofile)
+source("http://bioconductor.org/biocLite.R")#
+biocLite("snpStats", dependencies = T)
+library(snpStats)#
+#
+pedfile <- system.file("extdata/sample.ped.gz", package="snpStats")#
+pedfile#
+infofile <- system.file("extdata/sample.info", package="snpStats")#
+#
+sample <- read.pedfile(pedfile, snps=infofile)
+pedfile
+sample
+fam <- system.file("extdata/sample.fam", package="snpStats")#
+bim <- system.file("extdata/sample.bim", package="snpStats")#
+bed <- system.file("extdata/sample.bed", package="snpStats")#
+sample <- read.plink(bed, bim, fam)
+sample
+0.05/0.5
+sqrt(0.1)
+0.31*8
+exp(8)sqrt(0.31)
+exp(8)
+1-0.31
+1-0.69
+0.31*2
+1/.62
+1/0.0001
+10000/2
+5000/2
+2500/3
+2500/2
+1250/2
+625/2
+312.5/2
+156.25/2
+(10000/16) *1/6
+(10000/16) *1/2
+10000/2
+5000/2
+2500/2
+10000/3
+(10000/3)*1/2
+(10000*.5)/3
+(10000*.5)/4
+(10000*.5)/8
+(10000*.5)/16
+100/2
+50/2
+25/2
+12.5/2
+10000/2
+5000/2
+2500/2
+1250/2
+625/2
+312.5/2
+156.25
+156.25/2
+78.125/2
+39.0625/2
+19.53125/2
+#I think you can also use the 'subset' for exclusion - but slower on large arrays#
+library(data.table)#
+# Make a big fake data.frame and data.table#
+FirstCol <- rep(1,1000000)#
+SecondCol <- rep(100,1000000)#
+ThirdCol <- rep(4,1000000)#
+FourthCol <- rep(5,1000000)#
+df <- as.data.frame(cbind(FirstCol, SecondCol, ThirdCol, FourthCol))#
+dt <- data.table(FirstCol, SecondCol, ThirdCol, FourthCol)#
+test1 <- subset(df, select = c(FirstCol, SecondCol))#
+test2 <- subset(df, select = c(-FirstCol, -SecondCol))#
+system.time(test2 <- subset(df, select = c(-FirstCol, -SecondCol)))#
+system.time(test3 <- dt[,c("FirstCol", "SecondCol"):=NULL])
+dim(dt)
+88.16/2
+44.08+23.00
+55/2
+67.08+27.5
+111/2
+55.5+44.08
++23
+99.58+23
+setwd("/Users/katecrosby/expanding_polyps")
+totalSims <- 2#
+popsize.dip <- 1000#
+popsize.tetra <- 10#
+totalGen <- 100
+setwd("/Users/katecrosby/expanding_polyps")
+# Define the genotypes that would exist as diploids initially (as homozytoes)#
+# Note this is a single locus with two alleles#
+Dip1 <- c(1,1)#
+Dip2 <- c(0,0)
+setwd("/Users/katecrosby/expanding_polyps")
+Tetra1 <- c(1,1,1,1)#
+Tetra2 <- c(0,0,0,0)#
+#
+# Specify outcrossing rate (this will be incorporated into both the dips#
+# and the tetras), but can always split it up or up it or down it#
+outcrossingrate <- 0.02#
+#
+# Specify the autopolyploid rate, and an equal or lesser reduction rate per gen?#
+# Ask Simon how much red. vs. polyploid occurs - I assume more ups than downs#
+autopolyrate <- 0.001#
+redpolyrate <- 0.00001
+setwd("/Users/katecrosby/expanding_polyps")
+# Outputs defined below#
+Output = matrix(0,totalGen,15)#
+OutputSims = matrix (0, totalSims, 25)#
+#
+# Start simulation loop - i.e. for each simulation#
+for(isim in 1:totalSims)#
+{#
+  # Keep track of pseudo-random seeds for each simulation#
+  seeder<-round(runif(min=2, max = 80E4, n=1),2)#
+  set.seed(seeder)#
+#
+  # We can alter the nrow arg to change the starting frequencies in each#
+  # Right now I start the homozygotes in tetras and dips at p = 0.5#
+  Dip1 <- matrix(data = Dip1, nrow = popsize.dip*.5, ncol = 2, byrow = T)#
+  Dip2 <- matrix(data = Dip2, nrow = popsize.dip*.5, ncol = 2, byrow = T)#
+#
+  Tetra1 <- matrix(data = Tetra1, nrow = popsize.tetra*.5, ncol = 4, byrow = T)#
+  Tetra2 <- matrix(data = Tetra2, nrow = popsize.tetra*.5, ncol = 4, byrow = T)#
+#
+  # Make the initial generation parents array of the two types#
+  dip.parents <- rbind(Dip1, Dip2)#
+  tetra.parents <- rbind(Tetra1, Tetra2)
+setwd("/Users/katecrosby/expanding_polyps")
+#Start the generation loop - i.e. for each generation#
+  for(igen in 1:totalGen)#
+  {#
+    moms.dip <- dip.parents[sample(nrow(dip.parents), popsize.dip, replace=T),]#
+    num.dip.outcrossers <- rbinom(1, popsize.dip, outcrossingrate)#
+    selfers.dip <- popsize.dip - num.dip.outcrossers
+setwd("/Users/katecrosby/expanding_polyps")
+num.dip2tetra <- rbinom(1, popsize.dip, autopolyrate)#
+    num.tetra2dip <- rbinom(1, popsize.tetra, redpolyrate)#
+##################################################################################
+    moms.tetra <- tetra.parents[sample(nrow(tetra.parents), popsize.tetra, replace=T),]#
+    num.tetra.outcrossers <- rbinom(1,popsize.tetra,outcrossingrate)#
+#
+    selfers.tetra <- popsize.tetra - num.tetra.outcrossers
+setwd("/Users/katecrosby/expanding_polyps")
+Output[igen,1] <- igen#
+    Output[igen,2] <- popsize.dip#
+    Output[igen,3] <- popsize.tetra#
+    Output[igen,4] <- num.dip.outcrossers#
+    Output[igen,5] <- num.dip2tetra#
+    Output[igen,6] <- num.tetra2dip#
+    Output[igen,7] <- num.tetra.outcrossers#
+    Output[igen,8] <- selfers.dip#
+    Output[igen,9] <- selfers.tetra
+setwd("/Users/katecrosby/expanding_polyps")
+sex.dip <- sample(1:popsize.dip, num.dip.outcrossers)#
+    selfing.dip <- setdiff(1:popsize.dip, sex.dip)#
+#
+    sex.tetra <- sample(1:popsize.tetra, num.tetra.outcrossers)#
+    selfing.tetra <- setdiff(1:popsize.tetra, sex.tetra)#
+#
+    new.polys <- sample(1:popsize.dip, numdip2tetra)#
+    stay.dip <- setdiff(1:popsize.dip, new.polys)#
+#
+    new.dips <- sample(1:popsize.tetra, numtetra2dip)#
+    stay.tetra <- sample(1:popsize.tetra, new.dips)
+setwd("/Users/katecrosby/expanding_polyps")
+sex.dip <- moms.dip[sex.dip,]#
+    self.dip <- moms.dip[selfing.dip,]#
+    sex.tetra <- moms.tetra[sex.tetra,]#
+    self.tetra <- moms.tetra[selfing.tetra,]#
+#
+    # Start with outcrossing diploids - i.e. one locus two possible alleles#
+    # MOTHERS (i.e. NOT POLLEN), i.e. the maternal allele at thelocus#
+#
+    locus.dip.maternal <- sex.dip[,1:2]#
+    mom.sex.locus.dip.allele1 <- NULL#
+#
+    for(i in 1:nrow(locus.dip.maternal))#
+    {#
+      mom.sex.locus.dip.allele1[i] = sample(locus.dip.maternal[i,],1)#
+    }#
+#
+    # Now bring in the allele from diploid dads - the pollen#
+    dads.dip <- sample(1:popsize.dip,num.dip.outcrossers)#
+    dads.id.dip <- dip.parents[dads.dip,]#
+#
+    locus.dip.pollen <- dads.id.dip[,1:2]#
+    dad.sex.locus.dip.allele2 <- NULL#
+    for(i in 1:nrow(locus.dip.pollen))#
+    {#
+      dad.sex.locus.dip.allele2[i] = sample(locus.dip.pollen[i,],1)#
+    }
+setwd("/Users/katecrosby/expanding_polyps")
+new.outcrossed.dip.progeny <- data.frame(cbind(mom.sex.locus.dip.allele1, dad.sex.locus.dip.allele2)
+setwd("/Users/katecrosby/expanding_polyps")
+locus.tetra.maternal <- sex.tetra[,1:4]
+setwd("/Users/katecrosby/expanding_polyps")
+Output[igen,9] <- selfers.tetra
+setwd("/Users/katecrosby/expanding_polyps")
+totalSims <- 2
+setwd("/Users/katecrosby/expanding_polyps")
+popsize.dip <- 1000
+setwd("/Users/katecrosby/expanding_polyps")
+popsize.tetra <- 10#
+totalGen <- 100
+setwd("/Users/katecrosby/expanding_polyps")
+Dip1 <- c(1,1)
+setwd("/Users/katecrosby/expanding_polyps")
+Dip2 <- c(0,0)
+setwd("/Users/katecrosby/expanding_polyps")
+Tetra1 <- c(1,1,1,1)
+setwd("/Users/katecrosby/expanding_polyps")
+Tetra2 <- c(0,0,0,0)
+ls()
+setwd("/Users/katecrosby/expanding_polyps")
+outcrossingrate <- 0.02
+setwd("/Users/katecrosby/expanding_polyps")
+autopolyrate <- 0.001
+setwd("/Users/katecrosby/expanding_polyps")
+redpolyrate <- 0.00001
+setwd("/Users/katecrosby/expanding_polyps")
+Output = matrix(0,totalGen,15)
+setwd("/Users/katecrosby/expanding_polyps")
+OutputSims = matrix (0, totalSims, 25)
+setwd("/Users/katecrosby/expanding_polyps")
+seeder<-round(runif(min=2, max = 80E4, n=1),2)
+setwd("/Users/katecrosby/expanding_polyps")
+set.seed(seeder)
+setwd("/Users/katecrosby/expanding_polyps")
+Dip1 <- matrix(data = Dip1, nrow = popsize.dip*.5, ncol = 2, byrow = T)
+setwd("/Users/katecrosby/expanding_polyps")
+Dip2 <- matrix(data = Dip2, nrow = popsize.dip*.5, ncol = 2, byrow = T)
+setwd("/Users/katecrosby/expanding_polyps")
+Tetra1 <- matrix(data = Tetra1, nrow = popsize.tetra*.5, ncol = 4, byrow = T)
+setwd("/Users/katecrosby/expanding_polyps")
+Tetra2 <- matrix(data = Tetra2, nrow = popsize.tetra*.5, ncol = 4, byrow = T)
+setwd("/Users/katecrosby/expanding_polyps")
+dip.parents <- rbind(Dip1, Dip2)
+setwd("/Users/katecrosby/expanding_polyps")
+tetra.parents <- rbind(Tetra1, Tetra2)
+head(tetra.parents)
+head(dip.parents)
+dip.parents
+setwd("/Users/katecrosby/expanding_polyps")
+totalSims <- 2#
+popsize.dip <- 1000#
+popsize.tetra <- 1000#
+totalGen <- 100
+setwd("/Users/katecrosby/expanding_polyps")
+Dip1 <- c(1,1)#
+Dip2 <- c(0,0)
+setwd("/Users/katecrosby/expanding_polyps")
+Tetra1 <- c(1,1,1,1)
+setwd("/Users/katecrosby/expanding_polyps")
+Tetra2 <- c(0,0,0,0)
+setwd("/Users/katecrosby/expanding_polyps")
+outcrossingrate <- 0.02
+setwd("/Users/katecrosby/expanding_polyps")
+autopolyrate <- 0.001
+setwd("/Users/katecrosby/expanding_polyps")
+redpolyrate <- 0.00001
+setwd("/Users/katecrosby/expanding_polyps")
+Output = matrix(0,totalGen,15)
+setwd("/Users/katecrosby/expanding_polyps")
+OutputSims = matrix (0, totalSims, 25)
+setwd("/Users/katecrosby/expanding_polyps")
+seeder<-round(runif(min=2, max = 80E4, n=1),2)
+setwd("/Users/katecrosby/expanding_polyps")
+set.seed(seeder)
+setwd("/Users/katecrosby/expanding_polyps")
+Dip1 <- matrix(data = Dip1, nrow = popsize.dip*.5, ncol = 2, byrow = T)
+setwd("/Users/katecrosby/expanding_polyps")
+Dip2 <- matrix(data = Dip2, nrow = popsize.dip*.5, ncol = 2, byrow = T)
+setwd("/Users/katecrosby/expanding_polyps")
+Tetra1 <- matrix(data = Tetra1, nrow = popsize.tetra*.5, ncol = 4, byrow = T)
+setwd("/Users/katecrosby/expanding_polyps")
+Tetra2 <- matrix(data = Tetra2, nrow = popsize.tetra*.5, ncol = 4, byrow = T)
+setwd("/Users/katecrosby/expanding_polyps")
+dip.parents <- rbind(Dip1, Dip2)
+setwd("/Users/katecrosby/expanding_polyps")
+tetra.parents <- rbind(Tetra1, Tetra2)
+setwd("/Users/katecrosby/expanding_polyps")
+moms.dip <- dip.parents[sample(nrow(dip.parents), popsize.dip, replace=T),]
+setwd("/Users/katecrosby/expanding_polyps")
+num.dip.outcrossers <- rbinom(1, popsize.dip, outcrossingrate)
+setwd("/Users/katecrosby/expanding_polyps")
+selfers.dip <- popsize.dip - num.dip.outcrossers
+setwd("/Users/katecrosby/expanding_polyps")
+num.dip2tetra <- rbinom(1, popsize.dip, autopolyrate)
+setwd("/Users/katecrosby/expanding_polyps")
+num.tetra2dip <- rbinom(1, popsize.tetra, redpolyrate)
+setwd("/Users/katecrosby/expanding_polyps")
+moms.tetra <- tetra.parents[sample(nrow(tetra.parents), popsize.tetra, replace=T),]
+ls()
+setwd("/Users/katecrosby/expanding_polyps")
+num.tetra.outcrossers <- rbinom(1,popsize.tetra,outcrossingrate)
+setwd("/Users/katecrosby/expanding_polyps")
+selfers.tetra <- popsize.tetra - num.tetra.outcrossers
+setwd("/Users/katecrosby/expanding_polyps")
+sex.dip <- sample(1:popsize.dip, num.dip.outcrossers)
+setwd("/Users/katecrosby/expanding_polyps")
+selfing.dip <- setdiff(1:popsize.dip, sex.dip)
+setwd("/Users/katecrosby/expanding_polyps")
+sex.tetra <- sample(1:popsize.tetra, num.tetra.outcrossers)
+setwd("/Users/katecrosby/expanding_polyps")
+selfing.tetra <- setdiff(1:popsize.tetra, sex.tetra)
+setwd("/Users/katecrosby/expanding_polyps")
+new.polys <- sample(1:popsize.dip, numdip2tetra)
+setwd("/Users/katecrosby/expanding_polyps")
+stay.dip <- setdiff(1:popsize.dip, new.polys)
+setwd("/Users/katecrosby/expanding_polyps")
+new.dips <- sample(1:popsize.tetra, numtetra2dip)

@@ -33,11 +33,11 @@ outcrossingrate <- 0.02
 
 # Specify the autopolyploid rate, and an equal or lesser reduction rate per gen?
 # Ask Simon how much red. vs. polyploid occurs - I assume more ups than downs
-autopolyrate <- 0.001
-redpolyrate <- 0.00001
+#autopolyrate <- 0.1
+#redpolyrate <- 0.1
 
 # Outputs defined below
-Output = matrix(0,totalGen,15)
+Output = matrix(0,totalGen,20)
 OutputSims = matrix (0, totalSims, 25)
 
 # Start simulation loop - i.e. for each simulation
@@ -60,33 +60,33 @@ for(isim in 1:totalSims)
   tetra.parents <- rbind(Tetra1, Tetra2)
 
   #Start the generation loop - i.e. for each generation
-  #for(igen in 1:totalGen)
-  #{
+  for(igen in 1:totalGen)
+  {
     moms.dip <- dip.parents[sample(nrow(dip.parents), popsize.dip, replace=T),]
     num.dip.outcrossers <- rbinom(1, popsize.dip, outcrossingrate)
     selfers.dip <- popsize.dip - num.dip.outcrossers
-
+    
+    moms.tetra <- tetra.parents[sample(nrow(tetra.parents), popsize.tetra, replace=T),]
+    num.tetra.outcrossers <- rbinom(1,popsize.tetra,outcrossingrate)
+    selfers.tetra <- popsize.tetra - num.tetra.outcrossers
+    
 ####### HERE IS A HARD PART - we can identify a doubling but then need to double
 ##### array size mannnnnnnn - actually I think the code in R is easy - gotta think where
 ##### that line is gonna go
-    num.dip2tetra <- rbinom(1, popsize.dip, autopolyrate)
-    num.tetra2dip <- rbinom(1, popsize.tetra, redpolyrate)
+    #num.dip2tetra <- rbinom(1, popsize.dip, autopolyrate)
+    #num.tetra2dip <- rbinom(1, popsize.tetra, redpolyrate)
 #################################################################################
-    moms.tetra <- tetra.parents[sample(nrow(tetra.parents), popsize.tetra, replace=T),]
-    num.tetra.outcrossers <- rbinom(1,popsize.tetra,outcrossingrate)
-
-    selfers.tetra <- popsize.tetra - num.tetra.outcrossers
-
+  
 
     Output[igen,1] <- igen
     Output[igen,2] <- popsize.dip
     Output[igen,3] <- popsize.tetra
     Output[igen,4] <- num.dip.outcrossers
-    Output[igen,5] <- num.dip2tetra
-    Output[igen,6] <- num.tetra2dip
-    Output[igen,7] <- num.tetra.outcrossers
-    Output[igen,8] <- selfers.dip
-    Output[igen,9] <- selfers.tetra
+    #Output[igen,5] <- num.dip2tetra
+    #Output[igen,6] <- num.tetra2dip
+    Output[igen,5] <- num.tetra.outcrossers
+    Output[igen,6] <- selfers.dip
+    Output[igen,7] <- selfers.tetra
 
 
 # Section below I want to keep track of who's outcrossing vs. sexing
@@ -99,11 +99,11 @@ for(isim in 1:totalSims)
     sex.tetra <- sample(1:popsize.tetra, num.tetra.outcrossers)
     selfing.tetra <- setdiff(1:popsize.tetra, sex.tetra)
 
-    new.polys <- sample(1:popsize.dip, numdip2tetra)
-    stay.dip <- setdiff(1:popsize.dip, new.polys)
+    #new.polys <- sample(1:popsize.dip, numdip2tetra)
+    #stay.dip <- setdiff(1:popsize.dip, new.polys)
 
-    new.dips <- sample(1:popsize.tetra, numtetra2dip)
-    stay.tetra <- sample(1:popsize.tetra, new.dips)
+    #new.dips <- sample(1:popsize.tetra, numtetra2dip)
+    #stay.tetra <- sample(1:popsize.tetra, new.dips)
 
     # Identify those rows
     sex.dip <- moms.dip[sex.dip,]
@@ -123,10 +123,10 @@ for(isim in 1:totalSims)
     }
 
     # Now bring in the allele from diploid dads - the pollen
-    dads.dip <- sample(1:popsize.dip,num.dip.outcrossers)
+    dads.dip <- sample(1:popsize.dip, num.dip.outcrossers)
     dads.id.dip <- dip.parents[dads.dip,]
-
     locus.dip.pollen <- dads.id.dip[,1:2]
+
     dad.sex.locus.dip.allele2 <- NULL
     for(i in 1:nrow(locus.dip.pollen))
     {
@@ -136,7 +136,8 @@ for(isim in 1:totalSims)
 
 # Then cbind the alleles for diploid locus 1 together making a new dataframe
 
-new.outcrossed.dip.progeny <- data.frame(cbind(mom.sex.locus.dip.allele1, dad.sex.locus.dip.allele2)
+new.outcrossed.dip.progeny <- data.frame(cbind(mom.sex.locus.dip.allele1,
+                                               dad.sex.locus.dip.allele2))
 
 #################################################################################
 # Now repeat the whole outcrossing process for the tetraploids - note it's double
@@ -150,39 +151,39 @@ locus.tetra.maternal <- sex.tetra[,1:4]
   mom.sex.locus.tetra.allele1 <- NULL
   for(i in 1:nrow(locus.tetra.maternal))
   {
-  mom.sex.locus.tetra.allele1[i] = sample(locus.tetra.maternal[i,], 1, replace = T)
+    mom.sex.locus.tetra.allele1[i] = sample(locus.tetra.maternal[i,], 1, replace = T)
   }
 
-  mom.sex.locus.tetra.alelle2 <-NULL
+  mom.sex.locus.tetra.allele2 <- NULL
   for(i in 1:nrow(locus.tetra.maternal))
   {
-    mom.sex.locus.tetra.allele2[i] = sample(locus.tetra.maternal[i,], 1, replace =T)
+    mom.sex.locus.tetra.allele2[i] = sample(locus.tetra.maternal[i,], 1, replace = T)
   }
+
 
 # Now bring in the 2 alleles from tetraploid dads - the pollen
 # Need to sample 2 from tetraploid aaray
   dads.tetra <- sample(1:popsize.tetra, num.tetra.outcrossers)
   dads.id.tetra <- tetra.parents[dads.tetra,]
-
   locus.tetra.pollen <- dads.id.tetra[,1:4]
 
   dad.sex.locus.tetra.allele1 <- NULL
   for(i in 1:nrow(locus.tetra.pollen))
   {
-  dad.sex.locus.tetra.allele1[i] = sample(locus.tetra.pollen[i,],1, replace =T)
+    dad.sex.locus.tetra.allele1[i] = sample(locus.tetra.pollen[i,], 1, replace =T)
   }
 
   dad.sex.locus.tetra.allele2 <- NULL
   for(i in 1:nrow(locus.tetra.pollen))
   {
-    dad.sex.locus.tetra.allele2[i] = sample(locus.tetra.pollen[i,],1, replace =T)
+    dad.sex.locus.tetra.allele2[i] = sample(locus.tetra.pollen[i,], 1, replace =T)
   }
 
-# Then cbind the alleles for diploid locus 1 together making a new dataframe
+# Then cbind the alleles for tetraploid locus together making a new dataframe
 
-new.outcrossed.tetraploid.progeny <- data.frame(cbind(mom.sex.locus.tetra.allele1,
-  mom.sex.locus.tetra.allele2, dad.sex.locus.tetra.allele1,
-  dad.sex.locus.tetra.allele2)
+new.outcrossed.tetraploid.progeny <- data.frame(cbind(mom.sex.locus.tetra.allele1, mom.sex.locus.tetra.allele2,
+                                                      dad.sex.locus.tetra.allele1,
+                                                      dad.sex.locus.tetra.allele2))
 
 #################### SELFING ###################################################
     # Now do the selfers
@@ -211,24 +212,13 @@ new.selfed.dip.progeny <- data.frame(cbind(locus.dip.allele1, locus.dip.allele2)
 ##### this matrix is defined above - choose one allele
     locus.tetra.selfer <- self.tetra[,1:4]
 
-    locus.tetra.alleles.set1 <- NULL
+    new.selfed.tetra.progeny <- NULL
     for(i in 1:nrow(locus.tetra.selfer))
     {
-      locus.tetra.alleles.set1[i] <- sample(locus.tetra.selfer[i,],2,replace =T)
+      first.tetra.gamete <- sample(locus.tetra.selfer[i,],2,replace = T)
+      second.tetra.gamete<- sample(locus.tetra.selfer[i,],2,replace = T)
+      dd<-c(first.tetra.gamete, second.tetra.gamete)
     }
-
-    locus.tetra.alleles.set2 <- NULL
-    for(i in 1:nrow(locus.tetra.selfer))
-    {
-      locus.tetra.allele.set2[i] <- sample(locus.tetra.selfer[i],2,replace =T)
-    }
-
-
-    # Make the array of the selfed tetra progeny
-    new.selfed.tetra.progeny <- data.frame(cbind(locus.tetra.alleles.set1,
-      locus.tetra.alleles.set2))
-
-
 
 ######## New generation arrays, i.e. self + sex progeny ###########################
 # Combine diploid new gen arrays, just use column names from selfed diploid progeny
@@ -241,26 +231,7 @@ new.selfed.dip.progeny <- data.frame(cbind(locus.dip.allele1, locus.dip.allele2)
       names(new.selfed.tetra.progeny)))
     new.tetra.generation <- as.matrix(new.tetra.generation)
 
-    # Get homozygotes for each dip and tetra
-    # Note at this point I am not differentiating from aa or AA, same for tetra
-    dip.homs <- subset(new.dip.generation, locus.dip.allele1==locus.dip.allele2)
-
-    dim.dip.homs<-dim(dip.homs)
-
-    sum.dip.homs <- dim.dip.homs[1]
-
-    tetra.homs <- subset(new.tetra.generation, locus.tetra.allele1 ==
-      locus.dip.allele2 == locus.tetra.allele3 == locus.tetra.allele4)
-
-    dim.tetra.homs<-dim(tetra.homs)
-
-    sum.tetra.homs <- dim.tetra.homs[1]
-
-    #How many heterozygotes?
-    dip.hets <- popsize.dip - sum.dip.homs
-    tetra.hets <- popsize.tetra - sum.tetra.homs
-
-    #Get the other genotypes
+    #Get the genotypes
 
     dip.doms <- rowSums(new.dip.generation[,1:2]) == 2
     dip.rec <- rowSums(new.dip.generation[,1:2]) == 0
@@ -277,28 +248,25 @@ new.selfed.dip.progeny <- data.frame(cbind(locus.dip.allele1, locus.dip.allele2)
     tetra.other <- sum(tetra.other)
 
 
-    Output[igen,10] <- sum.dip.homs
-    Output[igen,11] <- sum.tetra.homs
-    Output[igen,12] <- dip.hets
-    Output[igen,13] <- tetra.hets
-    Output[igen,14] <- dip.doms
-    Output[igen,15] <- dip.doms/popsize.dip
-    Output[igen,16] <- dip.rec
-    Output[igen,17] <- dip.rec/popsize.dip
-    Output[igen,18] <- dip.other
-    Output[igen,19] <- dip.other/popsize.dip
-    Output[igen,20] <- tetra.doms
-    Output[igen,21] <- tetra.doms/popsize.tetra
-    Output[igen,22] <- tetra.rec
-    Output[igen,23] <- tetra.rec/popsize.tetra
-    Output[igen,24] <- tetra.other
-    Output[igen,25] <- tetra.other/popsize.tetra
+
+    Output[igen,9] <- dip.doms
+    Output[igen,10] <- dip.doms/popsize.dip
+    Output[igen,11] <- dip.rec
+    Output[igen,12] <- dip.rec/popsize.dip
+    Output[igen,13] <- dip.other
+    Output[igen,14] <- dip.other/popsize.dip
+    Output[igen,15] <- tetra.doms
+    Output[igen,16] <- tetra.doms/popsize.tetra
+    Output[igen,17] <- tetra.rec
+    Output[igen,18] <- tetra.rec/popsize.tetra
+    Output[igen,19] <- tetra.other
+    Output[igen,20] <- tetra.other/popsize.tetra
 
     dip.parents = new.dip.generation
     tetra.parents = new.tetra.generation
-#  }
+ }
 
-  #Output
+  Output
 
   # Define outputs for 1000 simulations
 
