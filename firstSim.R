@@ -50,13 +50,13 @@ tetraploids<-rbind(Tetra1,Tetra2)
 ###
 
 #set up a multi-dimensional array for the DIPLODS
-diploids.df<-array(0,dim=c(totalSims,popsize,totalGen+1,2))
+diploids.df<-array(0,dim=c(popsize,totalGen+1,2))
 #populate the first generation
-diploids.df[,,1,1]<-diploids[,1]
-diploids.df[,,1,2]<-diploids[,2]
+diploids.df[,1,1]<-diploids[,1]
+diploids.df[,1,2]<-diploids[,2]
 
 #set up a multi-dimensional array for the TETRAPLOIDS
-tetras.df<-array(0,dim=c(totalSims,popsize,totalGen+1,4))
+tetras.df<-array(0,dim=c(popsize,totalGen+1,4))
 #populate the first generation, four alleles this time
 tetras.df[,1,1]<-tetraploids[,1]
 tetras.df[,1,2]<-tetraploids[,2]
@@ -64,20 +64,20 @@ tetras.df[,1,3]<-tetraploids[,3]
 tetras.df[,1,4]<-tetraploids[,4]
 
 for ( j in 1: totalSims) {
-	print(paste("Simulations ", j))
+	print(paste("Simulation ", j))
 	for ( i in 1:totalGen ) {
 		print(paste("generation ", i))
 		####
 		# for diploids!!!
 		####
 		#grab the appropriate generation, 1 is the starting generation, see * later
-		pop<-diploids.df[j,1:2,i]
+		pop<-diploids.df[,i,1:2]
 		##generate a new bunch of 1000 individuals using the function generateOffpsring(). 
 		currentGen<-generateOffpsring(pop)
 		#add the new generation to the appropriate section of the 3D array
 		#insert into the ith+1 generation (i.e) move one generarion on
-		diploids.df[j,i+1,1]<-currentGen[,1]	#this is the first allele per individual
-		diploids.df[j,i+1,2]<-currentGen[,2]	#this is the second allele per individual
+		diploids.df[,i+1,1]<-currentGen[,1]	#this is the first allele per individual
+		diploids.df[,i+1,2]<-currentGen[,2]	#this is the second allele per individual
 		
 		####
 		# for tetraploids!!
@@ -87,10 +87,10 @@ for ( j in 1: totalSims) {
 		popTet<-tetras.df[,i,1:4]
 		currentGen<-generateOffpsring(popTet)
 		# add the new generation to the appropriate section of the 3D array
-		tetras.df[j,i+1,1]<-currentGen[1]	#this is the first allele per individual
-		tetras.df[j,i+1,2]<-currentGen[2]	#this is the second allele per individual
-		tetras.df[j,i+1,3]<-currentGen[3]	#this is the third allele per individual
-		tetras.df[j,i+1,4]<-currentGen[4]	#dito
+		tetras.df[,i+1,1]<-currentGen[1]	#this is the first allele per individual
+		tetras.df[,i+1,2]<-currentGen[2]	#this is the second allele per individual
+		tetras.df[,i+1,3]<-currentGen[3]	#this is the third allele per individual
+		tetras.df[,i+1,4]<-currentGen[4]	#dito
 	}#for i in totlaGens
 }#for i in totalSims
 #Now make a table for the abundance of the 0 allele over the generations
